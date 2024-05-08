@@ -10,5 +10,6 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
-
+    @Query("select u from User u where u.name like %?1%")
+    List<User> searhUser(String name);
 }

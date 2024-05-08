@@ -3,6 +3,7 @@ package org.example.mycrud.Controller;
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,12 @@ public class UserController {
     private UserService userService;
 
     @GetMapping(value = "")
-    public String index(Model model){
+    public String index(Model model, @Param("name") String name){
         List<User> users = userService.getListUser();
+        if (name!=null){
+            users = userService.searchUser(name);
+            model.addAttribute("name", name);
+        }
         model.addAttribute("users", users);
         return "index";
     }

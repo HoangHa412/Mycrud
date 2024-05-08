@@ -8,10 +8,10 @@
 <h1>Manager User</h1>
 
 <div>
-    <form th:object="${users}" action="" method="get">
+    <form>
         <button type="submit">Search</button>
         <label>
-            <input type="text" name="name" placeholder="Search by name">
+            <input type="text" name="name" placeholder="Search by name" th:value="${name}">
         </label>
     </form>
 </div>
