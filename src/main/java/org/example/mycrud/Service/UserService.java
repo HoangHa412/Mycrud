@@ -14,5 +14,5 @@ public interface UserService {
 
     void saveUser(User user);
 
-    List<User> searchUser(String name);
+    List<User> search(String keyword);
 }

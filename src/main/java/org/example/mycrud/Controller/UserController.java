@@ -4,6 +4,7 @@ import org.example.mycrud.Entity.User;
 import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,14 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping(value = "")
     public String index(Model model, @Param("name") String name){
         List<User> users = userService.getListUser();
-        if (name!=null){
-            users = userService.searchUser(name);
+        if (name !=null){
+            users=userService.search(name);
             model.addAttribute("name", name);
         }
         model.addAttribute("users", users);
@@ -36,6 +39,7 @@ public class UserController {
 
     @PostMapping(value = "save")
     public String saveUser(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.saveUser(user);
         return "redirect:/users";
     }
