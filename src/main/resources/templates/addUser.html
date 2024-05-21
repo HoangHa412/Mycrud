@@ -24,6 +24,10 @@
             <input type="text" th:field="*{password}" id="password">
         </div>
         <div>
+            <label th:text="Role" th:for="role"></label>
+            <input type="text" th:field="*{role}" id="role">
+        </div>
+        <div>
             <button type="submit">Save</button>
         </div>
     </form>

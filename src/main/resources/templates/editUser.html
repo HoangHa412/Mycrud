@@ -10,7 +10,7 @@
         <input type="hidden" th:field="*{id}">
         <div>
             <label th:text="Name" th:for="name"></label>
-            <input type="text" th:field="*{name}" placeholder="Nhap ten">
+            <input type="text" th:field="*{name}">
         </div>
         <div>
             <label th:text="Email" th:for="email"></label>
@@ -19,6 +19,10 @@
         <div>
             <label th:text="Phone" th:for="phone"></label>
             <input type="text" th:field="*{phone}">
+        </div>
+        <div>
+            <label th:text="Role" th:for="role"></label>
+            <input type="text" th:field="*{role}" id="role">
         </div>
         <div>
             <button type="submit">Save</button>

@@ -1,6 +1,8 @@
 package org.example.mycrud.Controller;
 
+import org.example.mycrud.Dto.UserDto;
 import org.example.mycrud.Entity.User;
+import org.example.mycrud.Mapper.UserMapper;
 import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -10,19 +12,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("users")
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @GetMapping(value = "")
     public String index(Model model, @Param("name") String name){
-        List<User> users = userService.getListUser();
+        List<UserDto> users = userService.getListUser();
         if (name !=null){
             users=userService.search(name);
             model.addAttribute("name", name);
@@ -52,8 +57,10 @@ public class UserController {
 
     @GetMapping(value = "/edit")
     public String editUser(@RequestParam("id") Long userId, Model model){
-        Optional<User> userEdit = userService.searchByID(userId);
-        userEdit.ifPresent(user -> model.addAttribute("user", user));
+        UserDto userEdit = userService.searchByID(userId);
+        if (userEdit!=null){
+        model.addAttribute("user", userEdit);
+        }
         return "editUser";
     }
 }
