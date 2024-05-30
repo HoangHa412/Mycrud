@@ -1,9 +1,10 @@
-package org.example.mycrud.Service;
+package org.example.mycrud.Service.Impl;
 
 import org.example.mycrud.Dto.UserDto;
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Mapper.UserMapper;
 import org.example.mycrud.Repository.UserRepository;
+import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     @Autowired
      private UserRepository userRepository;
 

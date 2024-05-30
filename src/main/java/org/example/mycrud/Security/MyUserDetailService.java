@@ -12,29 +12,31 @@ import java.util.Optional;
 
 @Service
 public class MyUserDetailService implements UserDetailsService {
+
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository repository;
+
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findUsersByName(username);
-        if(user.isPresent()){
-            var userobj = user.get();
+        Optional<User> user = repository.findUsersByName(username);
+        if (user.isPresent()) {
+            var userObj = user.get();
             return org.springframework.security.core.userdetails.User.builder()
-                    .username(userobj.getName())
-                    .password(userobj.getPassword())
-                    .roles(getRoles(userobj))
+                    .username(userObj.getName())
+                    .password(userObj.getPassword())
+                    .roles(userObj.getRole().name())
                     .build();
-        }else {
-            throw new UsernameNotFoundException("Khong tim thay ten nguoi dung" + username);
+        } else {
+            throw new UsernameNotFoundException(username);
         }
     }
 
-    private String[] getRoles(User user) {
-        if(user == null){
-            return new String[] {"USER"};
-        }else{
-            return user.getRole().split(",");
-        }
-    }
+//    private String[] getRoles(@NotNull User user) {
+//        if (user.getRole() == null) {
+//            return new String[]{"USER"};
+//        }
+//        return user.getRole().split(",");
+//    }
 }
