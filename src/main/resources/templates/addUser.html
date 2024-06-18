@@ -1,36 +1,58 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" >
 <head>
     <meta charset="UTF-8">
     <title>Add User</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<div>
-    <form th:object="${user}" th:action="@{save}" method="post">
-        <div>
-            <label th:text="Name" th:for="name"></label>
-            <input type="text" th:field="*{name}" placeholder="Nhap ten" id="name">
-        </div>
-        <div>
-            <label th:text="Email" th:for="email"></label>
-            <input type="text" th:field="*{email}" id="email">
-        </div>
-        <div>
-            <label th:text="Phone" th:for="phone"></label>
-            <input type="text" th:field="*{phone}" id="phone">
-        </div>
-        <div>
-            <label th:text="Password" th:for="password"></label>
-            <input type="text" th:field="*{password}" id="password">
-        </div>
-        <div>
-            <label th:text="Role" th:for="role"></label>
-            <input type="text" th:field="*{role}" id="role">
-        </div>
-        <div>
-            <button type="submit">Save</button>
-        </div>
-    </form>
+<div class="container">
+    <div class="col-md-12">
+        <h2 class="mt-5">Thêm danh sách</h2>
+        <form id="insert_data" >
+            <label>Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Nhập họ và tên">
+            <label>Email</label>
+            <input type="text" class="form-control" id="email" placeholder="Nhập Email">
+            <label>Phone</label>
+            <input type="text" class="form-control" id="phone" placeholder="Nhập số điện thoại">
+            <label>Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu">
+            <label>Role</label>
+            <input type="text" class="form-control" id="role">
+            <br>
+            <button class="btn btn-success" type="submit">Thêm</button>
+        </form>
+    </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $('#insert_data').submit(function(event) {
+            event.preventDefault();
+            const name = $('#name').val();
+            const email = $('#email').val();
+            const phone = $('#phone').val();
+            const password = $('#password').val();
+            const role = $('#role').val();
+
+            $.ajax({
+                url:'http://localhost:8081/users/save',
+                method:'POST',
+                contentType:'application/json',
+                data: JSON.stringify({name, email, phone, password, role}),
+                success: function(){
+                    alert('User added successfully');
+                    $('#name').val('');
+                    $('#email').val('');
+                    $('#phone').val('');
+                    $('#password').val('');
+                    $('#role').val('');
+                    window.location.href ="/users/index";
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

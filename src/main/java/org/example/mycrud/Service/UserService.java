@@ -1,19 +1,21 @@
 package org.example.mycrud.Service;
 
 import org.example.mycrud.Dto.UserDto;
-import org.example.mycrud.Entity.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     List<UserDto> getListUser();
 
-    UserDto searchByID(Long id);
+    Optional<UserDto> getByID(Long id);
 
     void deleteById(Long id);
 
-    void saveUser(User user);
+    UserDto saveUser(UserDto userDto);
 
     List<UserDto> search(String keyword);
+
+    Optional<UserDto> editUser(Long id, UserDto userDto);
 
 }

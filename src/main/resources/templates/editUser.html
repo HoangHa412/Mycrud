@@ -1,34 +1,76 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<div>
-    <form th:object="${user}" th:action="@{save}" method="post">
-        <input type="hidden" th:field="*{id}">
-        <div>
-            <label th:text="Name" th:for="name"></label>
-            <input type="text" th:field="*{name}">
+<div class="container">
+    <h1 class="mt-5">Edit User</h1>
+
+    <form id="editUserForm" class="mb-5">
+        <input type="hidden" id="id">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" >
         </div>
-        <div>
-            <label th:text="Email" th:for="email"></label>
-            <input type="text" th:field="*{email}">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" >
         </div>
-        <div>
-            <label th:text="Phone" th:for="phone"></label>
-            <input type="text" th:field="*{phone}">
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="text" class="form-control" id="phone">
         </div>
-        <div>
-            <label th:text="Role" th:for="role"></label>
-            <input type="text" th:field="*{role}" id="role">
+        <div class="form-group">
+            <label for="role">Role</label>
+            <input type="text" class="form-control" id="role">
         </div>
-        <div>
-            <button type="submit">Save</button>
-        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>
+<script>
+    $(document).ready(function () {
+        // Get user ID from query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
 
+        // Fetch user details and populate the form
+        $.ajax({
+            url: `http://localhost:8081/users/${userId}`,
+            method: 'GET',
+            success: function (user) {
+                $('#id').val(user.id);
+                $('#name').val(user.name);
+                $('#email').val(user.email);
+                $('#phone').val(user.phone);
+                $('#role').val(user.role);
+            },
+        });
+
+        // Update user details
+        $('#editUserForm').submit(function (event) {
+            event.preventDefault();
+            const id = $('#id').val();
+            const name = $('#name').val();
+            const email = $('#email').val();
+            const phone = $('#phone').val();
+            const role = $('#role').val();
+
+            $.ajax({
+                url: `http://localhost:8081/users/edit/${id}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({id, name, email, phone, role}),
+                success: function () {
+                    alert('User updated successfully!');
+                    window.location.href ="/users/index";
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

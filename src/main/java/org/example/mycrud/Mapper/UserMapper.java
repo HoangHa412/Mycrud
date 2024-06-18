@@ -15,19 +15,20 @@ public class UserMapper {
         userDto.setName(user.getName());
         userDto.setEmail(user.getEmail());
         userDto.setPhone(user.getPhone());
-        userDto.setRole(user.getRole().name());
+        userDto.setRole(user.getRole());
         return userDto;
     }
 
-//    public User convertToUser(@NotNull UserDto userDto){
-//        User user = new User();
-//        user.setId(userDto.getId());
-//        user.setName(userDto.getName());
-//        user.setEmail(userDto.getEmail());
-//        user.setPhone(userDto.getPhone());
-//        user.setRole(userDto.getRole());
-//        return user;
-//    }
+    public User convertToUser(@NotNull UserDto userDto){
+        User user = new User();
+        user.setId(userDto.getId());
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setPhone(userDto.getPhone());
+        user.setPassword((userDto.getPassword()));
+        user.setRole(userDto.getRole());
+        return user;
+    }
 
 
 

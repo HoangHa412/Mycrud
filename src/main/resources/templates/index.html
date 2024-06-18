@@ -1,39 +1,79 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Index</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<h1>Manager User</h1>
+<div class="container">
+    <h1 class="mt-5">User Management</h1>
+    <a href="/users/add" class="btn btn-primary mb-3">Add User</a>
+    <div id="userList">
+        <h2>User List</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="usersTable">
 
-<div>
-    <form>
-        <button type="submit">Search</button>
-        <label>
-            <input type="text" name="name" placeholder="Search by name" th:value="${name}">
-        </label>
-    </form>
+            </tbody>
+        </table>
+    </div>
 </div>
-<table style="text-align: center" border="1">
-    <tr>
-        <th>Id</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Actions</th>
-    </tr>
-    <tr th:each="user: ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.name}"></td>
-        <td th:text="${user.email}"></td>
-        <td th:text="${user.phone}"></td>
-        <td>
-            <a th:href="@{users/delete(id=${user.id})}"><button>Delete</button></a>
-            <a th:href="@{users/edit(id=${user.id})}"><button>Edit</button></a>
-        </td>
-    </tr>
-</table>
-<a href="users/add"><button>addUser</button></a>
+<script>
+    $(document).ready(function () {
+        function getUsers() {
+            $.ajax({
+                url: 'http://localhost:8081/users',
+                method: 'GET',
+                success: function (users) {
+                    $('#usersTable').empty();
+                    $.each(users, function (index, user) {
+                        console.log(users);
+                        $('#usersTable').append(`
+                            <tr>
+                                 <td>${user.id}</td>
+                                 <td>${user.name}</td>
+                                 <td>${user.email}</td>
+                                 <td>${user.phone}</td>
+                                 <td>
+                                    <a href="/users/edit?id=${user.id}" class="btn btn-info btn-sm">Edit</a>
+                                    <button class="btn btn-danger btn-sm deleteUser" data-id="${user.id}" =>Delete</button>
+                                 </td>
+                             </tr>
+                       `);
+                    });
+                    event();
+                }
+            });
+        }
+        getUsers();
+    });
+
+    function event(){
+        $(document).on('click','.deleteUser',function () {
+            const id = $(this).data('id');
+            $.ajax({
+                url: `http://localhost:8081/users/delete/${id}`,
+                method: 'DELETE',
+                success: function () {
+                    alert("Deleted successfully");
+                    window.location.href ="/users/index";
+                }
+            });
+        });
+    }
+
+
+
+
+</script>
 </body>
 </html>

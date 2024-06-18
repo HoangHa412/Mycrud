@@ -1,17 +1,16 @@
 package org.example.mycrud.Controller;
 
 import org.example.mycrud.Dto.UserDto;
-import org.example.mycrud.Entity.User;
-import org.example.mycrud.Mapper.UserMapper;
 import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @Controller
 @RequestMapping("users")
@@ -19,48 +18,67 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserMapper userMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @GetMapping(value = "")
-    public String index(Model model, @Param("name") String name){
+    @ResponseBody
+    public ResponseEntity<?> index(@Param("name") String name){
         List<UserDto> users = userService.getListUser();
         if (name !=null){
             users=userService.search(name);
-            model.addAttribute("name", name);
         }
-        model.addAttribute("users", users);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getUserById(@PathVariable Long id){
+        return userService.getByID(id)
+                .map(ResponseEntity :: ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @PostMapping("/save")
+    @ResponseBody
+    public UserDto saveUser(@RequestBody UserDto userDto){
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        return userService.saveUser(userDto);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        if(userService.getByID(id).isPresent()){
+            userService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping(value = "/edit/{id}")
+    @ResponseBody
+    public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody UserDto userDto){
+        return userService.editUser(id, userDto)
+                .map(ResponseEntity :: ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/index")
+    public String index(){
         return "index";
     }
 
-    @RequestMapping(value = "add")
-    public String addUser(Model model){
-        model.addAttribute("user", new User());
+    @GetMapping("/add")
+    public String addUser(){
         return "addUser";
     }
 
-    @PostMapping(value = "save")
-    public String saveUser(User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.saveUser(user);
-        return "redirect:/users";
-    }
-
-    @GetMapping(value = "/delete")
-    public String deleteUser(@RequestParam("id") Long id) {
-        userService.deleteById(id);
-        return "redirect:/users";
-    }
-
-    @GetMapping(value = "/edit")
-    public String editUser(@RequestParam("id") Long userId, Model model){
-        UserDto userEdit = userService.searchByID(userId);
-        if (userEdit!=null){
-        model.addAttribute("user", userEdit);
-        }
+    @GetMapping("/edit")
+    public String editUser(){
         return "editUser";
     }
 }

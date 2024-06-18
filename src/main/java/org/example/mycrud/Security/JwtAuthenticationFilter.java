@@ -1,4 +1,4 @@
-package org.example.mycrud.security;
+package org.example.mycrud.Security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

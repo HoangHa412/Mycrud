@@ -1,4 +1,4 @@
-package org.example.mycrud.security;
+package org.example.mycrud.Security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,18 +11,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.net.http.HttpRequest;
-
 @Configuration
 @EnableWebSecurity
-public class Securityconfig {
+public class SecurityConfig {
 
     @Autowired
     private MyUserDetailService myUserDetailService;
@@ -43,13 +40,14 @@ public class Securityconfig {
                     registry.requestMatchers("/users").hasAnyRole("USER", "ADMIN");
                     registry.requestMatchers("/users/**").hasRole("ADMIN");
                     registry.requestMatchers("/register", "/authenticate").permitAll();
+//                    registry.requestMatchers("/**").permitAll();
                     registry.anyRequest().authenticated();
                 })
                 .formLogin(httpSecurityFormLoginConfigurer -> {
                     httpSecurityFormLoginConfigurer
                             .loginPage("/login")
                             .loginProcessingUrl("/login")
-                            .defaultSuccessUrl("/users")
+                            .defaultSuccessUrl("/users/index")
                             .permitAll();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

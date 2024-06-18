@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.mycrud.Entity.Role;
 
 @Getter
 @Setter
@@ -22,6 +23,8 @@ public class UserDto {
     //@Pattern(regexp = "^[0-9]{10,10}$")
     private String phone;
     //@Pattern(regexp = "^[A-Z]$")
-    private String role;
+    private String password;
+
+    private Role role;
 
 }

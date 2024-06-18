@@ -1,4 +1,4 @@
-package org.example.mycrud.security;
+package org.example.mycrud.Security;
 
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Repository.UserRepository;
