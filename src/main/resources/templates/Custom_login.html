@@ -6,55 +6,45 @@
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .login-container {
-            width: 300px;
-            margin: 0 auto;
-            margin-top: 100px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        h2 {
-            text-align: center;
-        }
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-        input[type="submit"] {
-            width: 100%;
-            background-color: #4caf50;
-            color: white;
-            padding: 10px;
-            margin: 5px 0;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-    </style>
 </head>
 <body>
-<div class="login-container">
-    <h2>Đăng nhập</h2>
-    <form action="/login" method="post" >
-        <label for="username">Tên đăng nhập:</label>
-        <input type="text" id="username" name="username" required>
-        <label for="password">Mật khẩu:</label>
-        <input type="password" id="password" name="password" required>
-        <input type="submit" value="Đăng nhập">
+<div class="container">
+    <h1 class="mt-5">Login</h1>
+
+    <form id="loginForm" class="mt-4">
+        <div class="form-group">
+            <label for="name">Username</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
 </div>
+    <script>
+        $(document).ready(function () {
+            function login(){
+                $('#loginForm').submit(function (event) {
+                    event.preventDefault();
+                    const username = $('#name').val();
+                    const password = $('#password').val();
+                    $.ajax({
+                        url: 'http://localhost:8081/authenticate',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({username, password}),
+                        success: function (response) {
+                            console.log("JWT Token: ", response);
+                            localStorage.setItem("token", response);
+                            window.location.href = "/index";
+                        }
+                    })
+                });
+            }
+            login();
+        });
+    </script>
 </body>
 </html>

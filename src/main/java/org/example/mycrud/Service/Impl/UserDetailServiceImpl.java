@@ -1,4 +1,4 @@
-package org.example.mycrud.Security;
+package org.example.mycrud.Service.Impl;
 
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Repository.UserRepository;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class MyUserDetailService implements UserDetailsService {
+public class  UserDetailServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;
@@ -33,10 +33,4 @@ public class MyUserDetailService implements UserDetailsService {
         }
     }
 
-//    private String[] getRoles(@NotNull User user) {
-//        if (user.getRole() == null) {
-//            return new String[]{"USER"};
-//        }
-//        return user.getRole().split(",");
-//    }
 }

@@ -1,12 +1,15 @@
 package org.example.mycrud.Security;
 
+import org.example.mycrud.Service.Impl.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.OAuth2ResourceServerDsl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Autowired
-    private MyUserDetailService myUserDetailService;
+    private UserDetailServiceImpl userDetailServiceImpl;
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -37,17 +40,17 @@ public class SecurityConfig {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/users").hasAnyRole("USER", "ADMIN");
-                    registry.requestMatchers("/users/**").hasRole("ADMIN");
+                    registry.requestMatchers("/index").permitAll();
+                    registry.requestMatchers("/index/**").hasRole("ADMIN");
                     registry.requestMatchers("/register", "/authenticate").permitAll();
-//                    registry.requestMatchers("/**").permitAll();
+                    //registry.requestMatchers("/**").permitAll();
                     registry.anyRequest().authenticated();
                 })
                 .formLogin(httpSecurityFormLoginConfigurer -> {
                     httpSecurityFormLoginConfigurer
                             .loginPage("/login")
                             .loginProcessingUrl("/login")
-                            .defaultSuccessUrl("/users/index")
+                            .defaultSuccessUrl("/index", true)
                             .permitAll();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -57,13 +60,13 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return myUserDetailService;
+        return userDetailServiceImpl;
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(myUserDetailService);
+        provider.setUserDetailsService(userDetailServiceImpl);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

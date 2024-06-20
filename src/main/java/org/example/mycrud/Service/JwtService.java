@@ -2,7 +2,6 @@ package org.example.mycrud.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -25,11 +24,11 @@ public class JwtService {
 //        Map<String, String> claims = new HashMap<>();
 //        claims.put("iss", "https://secure.genuinecoder.com");
         return Jwts.builder()
-                //.claims(claims)
+               // .claims(claims)
                 .subject(userDetails.getUsername())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusMillis(VALIDITY)))
-                .signWith(generateKey(), SignatureAlgorithm.HS256)
+                .signWith(generateKey())
                 .compact();
     }
 

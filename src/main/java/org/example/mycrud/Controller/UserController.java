@@ -1,5 +1,6 @@
 package org.example.mycrud.Controller;
 
+import jakarta.validation.Valid;
 import org.example.mycrud.Dto.UserDto;
 import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@Controller
+@RestController
 @RequestMapping("users")
 public class UserController {
     @Autowired
     private UserService userService;
-
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -40,10 +40,9 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-
     @PostMapping("/save")
     @ResponseBody
-    public UserDto saveUser(@RequestBody UserDto userDto){
+    public UserDto saveUser(@Valid @RequestBody UserDto userDto){
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         return userService.saveUser(userDto);
     }
@@ -61,24 +60,9 @@ public class UserController {
 
     @PutMapping(value = "/edit/{id}")
     @ResponseBody
-    public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody UserDto userDto){
+    public ResponseEntity<?> editUser(@Valid @PathVariable Long id, @RequestBody UserDto userDto){
         return userService.editUser(id, userDto)
                 .map(ResponseEntity :: ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/index")
-    public String index(){
-        return "index";
-    }
-
-    @GetMapping("/add")
-    public String addUser(){
-        return "addUser";
-    }
-
-    @GetMapping("/edit")
-    public String editUser(){
-        return "editUser";
     }
 }

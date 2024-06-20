@@ -14,11 +14,11 @@
         <input type="hidden" id="id">
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" >
+            <input type="text" class="form-control" id="name">
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" >
+            <input type="email" class="form-control" id="email">
         </div>
         <div class="form-group">
             <label for="phone">Phone</label>
@@ -62,11 +62,14 @@
             $.ajax({
                 url: `http://localhost:8081/users/edit/${id}`,
                 method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem("token")
+                },
                 contentType: 'application/json',
                 data: JSON.stringify({id, name, email, phone, role}),
                 success: function () {
                     alert('User updated successfully!');
-                    window.location.href ="/users/index";
+                    window.location.href = "/index";
                 }
             });
         });

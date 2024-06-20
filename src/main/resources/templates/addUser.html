@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Add User</title>
@@ -10,7 +10,7 @@
 <div class="container">
     <div class="col-md-12">
         <h2 class="mt-5">Thêm danh sách</h2>
-        <form id="insert_data" >
+        <form id="insert_data">
             <label>Name</label>
             <input type="text" class="form-control" id="name" placeholder="Nhập họ và tên">
             <label>Email</label>
@@ -27,8 +27,8 @@
     </div>
 </div>
 <script>
-    $(document).ready(function(){
-        $('#insert_data').submit(function(event) {
+    $(document).ready(function () {
+        $('#insert_data').submit(function (event) {
             event.preventDefault();
             const name = $('#name').val();
             const email = $('#email').val();
@@ -37,18 +37,21 @@
             const role = $('#role').val();
 
             $.ajax({
-                url:'http://localhost:8081/users/save',
-                method:'POST',
-                contentType:'application/json',
+                url: 'http://localhost:8081/users/save',
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem("token")
+                },
+                contentType: 'application/json',
                 data: JSON.stringify({name, email, phone, password, role}),
-                success: function(){
+                success: function () {
                     alert('User added successfully');
                     $('#name').val('');
                     $('#email').val('');
                     $('#phone').val('');
                     $('#password').val('');
                     $('#role').val('');
-                    window.location.href ="/users/index";
+                    window.location.href = "/index";
                 }
             });
         });

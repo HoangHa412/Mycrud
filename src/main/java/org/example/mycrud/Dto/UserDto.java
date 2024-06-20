@@ -20,7 +20,8 @@ public class UserDto {
     //@NotBlank(message = "Email is mandatory")
     //@Pattern(regexp = "^[a-zA-Z0-9._]+@[a-zA-Z0-9.]$")
     private String email;
-    //@Pattern(regexp = "^[0-9]{10,10}$")
+    @Pattern(regexp = "^[0-9]{10,10}$", message = "Phone number minimun 10 digits")
+
     private String phone;
     //@Pattern(regexp = "^[A-Z]$")
     private String password;
