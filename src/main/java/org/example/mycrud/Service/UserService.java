@@ -1,6 +1,6 @@
 package org.example.mycrud.Service;
 
-import org.example.mycrud.Dto.UserDto;
+import org.example.mycrud.model.UserDto;
 
 import java.util.List;
 import java.util.Optional;

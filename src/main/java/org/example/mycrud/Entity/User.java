@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class User {
     private Long id;
 
     @Column(name = "name")
-    private String name;
+    private String username;
 
     @Column(name = "email")
     private String email;
@@ -29,6 +31,6 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserRole> userRoles;
 }

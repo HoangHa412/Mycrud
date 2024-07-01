@@ -1,23 +1,19 @@
 package org.example.mycrud.Service.Impl;
 
-import jakarta.security.auth.message.AuthException;
-import org.example.mycrud.Dto.UserDto;
+import org.example.mycrud.Exception.CustomException;
+import org.example.mycrud.Exception.ErrorCode;
+import org.example.mycrud.model.UserDto;
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Mapper.UserMapper;
 import org.example.mycrud.Repository.UserRepository;
-import org.example.mycrud.Service.JwtService;
 import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -64,11 +60,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<UserDto> editUser(Long id, UserDto userDto) {
         return userRepository.findById(id)
-                .map(existingUser ->{
-                    existingUser.setName(userDto.getName());
+                .map(existingUser -> {
+                    existingUser.setUsername(userDto.getName());
                     existingUser.setEmail(userDto.getEmail());
                     existingUser.setPhone(userDto.getPhone());
-                    existingUser.setRole(userDto.getRole());
                     return userMapper.convertToUserDto(userRepository.save(existingUser));
                 });
     }

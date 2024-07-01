@@ -11,10 +11,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query("select u from User u where u.name like %?1%")
+    @Query("select u from User u where u.username like %?1%")
     List<User> search(String keyword);
 
-    Optional<User> findUsersByName(String name);
+    Optional<User> findUsersByUsername(String name);
 
-    Optional<User> findByName(String name);
+    Boolean existsUserByUsername(String username);
+
 }

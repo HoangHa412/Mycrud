@@ -23,28 +23,29 @@
         <button type="submit" class="btn btn-primary">Login</button>
     </form>
 </div>
-    <script>
-        $(document).ready(function () {
-            function login(){
-                $('#loginForm').submit(function (event) {
-                    event.preventDefault();
-                    const username = $('#name').val();
-                    const password = $('#password').val();
-                    $.ajax({
-                        url: 'http://localhost:8081/authenticate',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({username, password}),
-                        success: function (response) {
-                            console.log("JWT Token: ", response);
-                            localStorage.setItem("token", response);
-                            window.location.href = "/index";
-                        }
-                    })
-                });
-            }
-            login();
-        });
-    </script>
+<script>
+    $(document).ready(function () {
+        function login() {
+            $('#loginForm').submit(function (event) {
+                event.preventDefault();
+                const username = $('#name').val();
+                const password = $('#password').val();
+                $.ajax({
+                    url: 'http://localhost:8081/authenticate',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({username, password}),
+                    success: function (response) {
+                        console.log("JWT Token: ", response);
+                        localStorage.setItem("token", response);
+                        //window.location.href = "/index";
+                    }
+                })
+            });
+        }
+
+        login();
+    });
+</script>
 </body>
 </html>

@@ -1,7 +1,9 @@
-package org.example.mycrud.Dto;
+package org.example.mycrud.model;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,16 +16,16 @@ import org.example.mycrud.Entity.Role;
 @NoArgsConstructor
 public class UserDto {
     private Long id;
-    //@NotBlank(message = "Name is mandatory")
-    //@Pattern(regexp = "^[a-zA-Z0-9]$", message = "Username must be alphanumerics")
+    @NotBlank(message = "Name is mandatory")
     private String name;
-    //@NotBlank(message = "Email is mandatory")
-    //@Pattern(regexp = "^[a-zA-Z0-9._]+@[a-zA-Z0-9.]$")
-    private String email;
-    @Pattern(regexp = "^[0-9]{10,10}$", message = "Phone number minimun 10 digits")
 
+    //@Email
+    private String email;
+
+    //@Pattern(regexp = "^[0-9]{10,10}$", message = "Phone number minimun 10 digits")
     private String phone;
-    //@Pattern(regexp = "^[A-Z]$")
+
+    @Size(min = 8, max = 20, message = "Password must be between 8")
     private String password;
 
     private Role role;
