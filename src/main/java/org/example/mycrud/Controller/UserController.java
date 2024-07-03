@@ -2,19 +2,20 @@ package org.example.mycrud.Controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
+import org.example.mycrud.Entity.User;
 import org.example.mycrud.Exception.ErrorCode;
+import org.example.mycrud.Mapper.UserMapper;
 import org.example.mycrud.model.UserDto;
 import org.example.mycrud.Service.UserService;
 import org.example.mycrud.model.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,29 +27,32 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    
+    private UserMapper userMapper;
 
     @GetMapping(value = "")
     @ResponseBody
-    public BaseResponse<List<UserDto>> index(@Param("name") String name) {
-        List<UserDto> users = userService.getListUser();
-        BaseResponse<List<UserDto>> userResponse = new BaseResponse<>(0, "Success", users);
+    public ResponseEntity<?> index(@Param("name") String name) {
+        List<User> users = userService.getListUser();
 //        if (name != null) {
 //            users = userService.search(name);
 //        }
-        return userResponse;
+        List<UserDto> usersDto = new ArrayList<>();
+        for (User user : users) {
+            usersDto.add(userMapper.convertToUserDto(user));
+        }
+        return ResponseEntity.ok().body(BaseResponse.builder()
+                .code(ErrorCode.SUCCESS.getCode()).message(ErrorCode.SUCCESS.getMessage()).content(usersDto));
     }
 
     @GetMapping("{id}")
     @ResponseBody
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        Optional<UserDto> user = userService.getByID(id);
+        User user = userService.getByID(id);
         BaseResponse<UserDto> response = new BaseResponse<>();
-        if (user.isPresent()) {
+        if (user != null) {
             response.setCode(0);
             response.setMessage("Success");
-            response.setContent(user.get());
+            response.setContent(userMapper.convertToUserDto(user));
         } else {
             response.setCode(ErrorCode.USER_NOT_FOUND.getCode());
             response.setMessage(ErrorCode.USER_NOT_FOUND.getMessage());
@@ -58,28 +62,37 @@ public class UserController {
 
     @PostMapping("/save")
     @ResponseBody
-    public BaseResponse<UserDto> saveUser(@Valid @RequestBody UserDto userDto) {
-        BaseResponse<UserDto> response = new BaseResponse<>(0, "User saved successfully", userService.saveUser(userDto));
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        return response;
+    public ResponseEntity<?> saveUser(@Valid @RequestBody UserDto userdto) {
+        userService.saveUser(userMapper.convertToUser(userdto));
+        return ResponseEntity.ok()
+                .body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message(ErrorCode.USER_ALREADY_EXISTS.getMessage()).content(userdto).build());
     }
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        if (userService.getByID(id).isPresent()) {
+        if (userService.getByID(id) != null) {
             userService.deleteById(id);
-            return ResponseEntity.ok(new BaseResponse<>(0, "User deleted successfully", null));
+            return ResponseEntity.ok(new BaseResponse<>(ErrorCode.SUCCESS.getCode(), ErrorCode.SUCCESS.getMessage(), null));
         } else {
-            return ResponseEntity.ok(BaseResponse.builder().code(ErrorCode.USER_NOT_FOUND.getCode()).message(ErrorCode.USER_ALREADY_EXISTS.getMessage()));
+            return ResponseEntity.ok(BaseResponse.builder().code(ErrorCode.USER_NOT_FOUND.getCode()).message(ErrorCode.USER_NOT_FOUND.getMessage()));
         }
     }
 
     @PutMapping(value = "/edit/{id}")
     @ResponseBody
-    public ResponseEntity<?> editUser(@Valid @PathVariable Long id, @RequestBody UserDto userDto) {
-        return userService.editUser(id, userDto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody UserDto userdto) {
+        BaseResponse response = new BaseResponse();
+        User existingUser = userService.getByID(id);
+        if (existingUser != null) {
+            existingUser.setUsername(userdto.getUsername());
+            existingUser.setEmail(userdto.getEmail());
+            existingUser.setPhone(userdto.getPhone());
+            userService.saveUser(existingUser);
+            response.setCode(ErrorCode.SUCCESS.getCode());
+            response.setMessage(ErrorCode.SUCCESS.getMessage());
+            response.setContent(userMapper.convertToUserDto(existingUser));
+        }
+        return ResponseEntity.ok(response);
     }
 }

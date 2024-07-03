@@ -1,39 +1,32 @@
 package org.example.mycrud.Service.Impl;
 
-import org.example.mycrud.Exception.CustomException;
-import org.example.mycrud.Exception.ErrorCode;
-import org.example.mycrud.model.UserDto;
 import org.example.mycrud.Entity.User;
-import org.example.mycrud.Mapper.UserMapper;
 import org.example.mycrud.Repository.UserRepository;
 import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.zip.DataFormatException;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+
     @Autowired
-    private UserMapper userMapper;
+    private PasswordEncoder passwordEncoder;
 
 
     @Override
-    public List<UserDto> getListUser() {
-        return userRepository.findAll().stream()
-                .map(userMapper::convertToUserDto)
-                .collect(Collectors.toList());
+    public List<User> getListUser() {
+        return userRepository.findAll();
     }
 
     @Override
-    public Optional<UserDto> getByID(Long id) {
-        return userRepository.findById(id).map(userMapper::convertToUserDto);
+    public User getByID(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -42,29 +35,64 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto saveUser(UserDto userDto) {
-        User user = userMapper.convertToUser(userDto);
-        User saveUser = userRepository.save(user);
-        return userMapper.convertToUserDto(saveUser);
-
+    public User saveUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
 
     @Override
-    public List<UserDto> search(String keyword) {
-        return userRepository.search(keyword).stream()
-                .map(userMapper::convertToUserDto)
-                .collect(Collectors.toList());
+    public List<User> search(String keyword) {
+        return userRepository.search(keyword);
+    }
+
+
+    @Override
+    public User getByEmail(String email) {
+        return userRepository.findUsersByEmail(email.trim());
     }
 
     @Override
-    public Optional<UserDto> editUser(Long id, UserDto userDto) {
-        return userRepository.findById(id)
-                .map(existingUser -> {
-                    existingUser.setUsername(userDto.getName());
-                    existingUser.setEmail(userDto.getEmail());
-                    existingUser.setPhone(userDto.getPhone());
-                    return userMapper.convertToUserDto(userRepository.save(existingUser));
-                });
+    public User getByUsername(String username) {
+        return userRepository.findUsersByUsername(username).orElse(null);
     }
+
+    @Override
+    public Boolean checkUserName(String username) {
+        return userRepository.existsUserByUsername(username);
+    }
+
+    @Override
+    public Boolean oldPasswordValidity(String oldPassword, User user) {
+        return passwordEncoder.matches(oldPassword, user.getPassword());
+    }
+
+    @Override
+    public Boolean newPasswordValidity(String newPassword, String confirmPassword) {
+        return passwordEncoder.matches(newPassword, confirmPassword);
+    }
+
+    @Override
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void forgetPassword(String email, String password) {
+        //find email
+        User oCurrentMail = userRepository.findUsersByEmail(email.trim());
+
+        if (oCurrentMail != null) {
+            //set new password
+            oCurrentMail.setPassword(passwordEncoder.encode(password));
+
+            //save new password
+            userRepository.save(oCurrentMail);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+
+    }
+
 }

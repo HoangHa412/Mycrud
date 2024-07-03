@@ -17,7 +17,7 @@ import org.example.mycrud.Entity.Role;
 public class UserDto {
     private Long id;
     @NotBlank(message = "Name is mandatory")
-    private String name;
+    private String username;
 
     //@Email
     private String email;
@@ -25,9 +25,8 @@ public class UserDto {
     //@Pattern(regexp = "^[0-9]{10,10}$", message = "Phone number minimun 10 digits")
     private String phone;
 
-    @Size(min = 8, max = 20, message = "Password must be between 8")
+    //@Size(min = 8, max = 20, message = "Password must be between 8")
     private String password;
 
-    private Role role;
 
 }

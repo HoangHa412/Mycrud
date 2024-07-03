@@ -28,14 +28,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         User user = repository.findUsersByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        Collection<GrantedAuthority> grantedAuthorities = new HashSet<>();
-
-        Set<UserRole> userRoles = user.getUserRoles();
-        for (UserRole userRole : userRoles) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(userRole.getRole().getName()));
-        }
-
-        return new UserDetailsImpl(user, grantedAuthorities);
+        return UserDetailsImpl.build(user);
     }
 
 }

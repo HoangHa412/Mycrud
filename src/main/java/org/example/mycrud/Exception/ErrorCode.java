@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
 
+    SUCCESS(0, "SUCCESS"),
+    NOT_FOUND(1, "Not found"),
+    UNAUTHORIZED(1, "Token expired"),
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error"),
     USER_NOT_FOUND(404, "User not found"),
     USER_ALREADY_EXISTS(409, "User already exists"),
@@ -20,5 +23,6 @@ public enum ErrorCode {
 
     private Integer code;
     private String message;
+
 
 }

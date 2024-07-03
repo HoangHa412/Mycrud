@@ -10,7 +10,7 @@ public class UserMapper {
     public UserDto convertToUserDto(@NotNull User user) {
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
-        userDto.setName(user.getUsername());
+        userDto.setUsername(user.getUsername());
         userDto.setEmail(user.getEmail());
         userDto.setPhone(user.getPhone());
         return userDto;
@@ -19,7 +19,7 @@ public class UserMapper {
     public User convertToUser(@NotNull UserDto userDto) {
         User user = new User();
         user.setId(userDto.getId());
-        user.setUsername(userDto.getName());
+        user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setPhone(userDto.getPhone());
         user.setPassword((userDto.getPassword()));

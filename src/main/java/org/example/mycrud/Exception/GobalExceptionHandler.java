@@ -33,26 +33,27 @@ public class GobalExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<?> handlingException(RuntimeException exception) {
+    ResponseEntity<?> handlingException(Exception exception) {
 
-        BaseResponse<?> response = new BaseResponse();
+        BaseResponse<String> response = new BaseResponse();
 
         response.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-        response.setMessage(exception.getMessage());
+        response.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
+        response.setContent(exception.getMessage());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-//    @ExceptionHandler(value = CustomException.class)
-//    ResponseEntity<BaseResponse<String>> handlingCustomException(CustomException exception) {
-//        ErrorCode errorCode = exception.getErrorCode();
-//        BaseResponse<String> response = new BaseResponse<>();
-//
-//        response.setCode(errorCode.getCode());
-//        response.setMessage(errorCode.getMessage());
-//
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-//    }
+    @ExceptionHandler(value = CustomException.class)
+    ResponseEntity<BaseResponse<String>> handlingCustomException(CustomException exception) {
+        ErrorCode errorCode = exception.getErrorCode();
+        BaseResponse<String> response = new BaseResponse<>();
+
+        response.setCode(errorCode.getCode());
+        response.setMessage(errorCode.getMessage());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 
 //    @ExceptionHandler(value = AuthenticationException.class)
 //    ResponseEntity<BaseResponse<String>> handlingCustomException(AuthenticationException exception) {

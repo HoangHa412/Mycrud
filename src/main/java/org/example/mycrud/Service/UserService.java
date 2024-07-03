@@ -1,22 +1,32 @@
 package org.example.mycrud.Service;
 
-import org.example.mycrud.model.UserDto;
+import org.example.mycrud.Entity.User;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
-    List<UserDto> getListUser();
+    List<User> getListUser();
 
-    Optional<UserDto> getByID(Long id);
+    User getByID(Long id);
 
     void deleteById(Long id);
 
-    UserDto saveUser(UserDto userDto);
+    User saveUser(User user);
 
-    List<UserDto> search(String keyword);
+    List<User> search(String keyword);
 
-    Optional<UserDto> editUser(Long id, UserDto userDto);
+    void forgetPassword(String email, String password);
+
+    User getByEmail(String email);
 
 
+    User getByUsername(String username);
+
+    Boolean checkUserName(String username);
+
+    Boolean oldPasswordValidity(String oldPassword, User user);
+
+    Boolean newPasswordValidity(String newPassword, String confirmPassword);
+
+    void changePassword(User user, String newPassword);
 }
