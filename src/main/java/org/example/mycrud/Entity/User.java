@@ -35,7 +35,7 @@ public class User {
     private Set<UserRole> userRoles;
 
     @OneToOne(mappedBy = "user")
-    private ForgotPassword forgotPassword;
+    private PasswordResetToken passwordResetToken;
 //    @ManyToMany(fetch = FetchType.LAZY)
 //    @JoinTable(name = "user_role",
 //            joinColumns = @JoinColumn(name = "user_id"),

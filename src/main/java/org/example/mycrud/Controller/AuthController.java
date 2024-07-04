@@ -1,18 +1,18 @@
 package org.example.mycrud.Controller;
 
 
-import org.example.mycrud.Entity.ForgotPassword;
+import jakarta.servlet.http.HttpServletRequest;
+import org.example.mycrud.Entity.PasswordResetToken;
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Exception.ErrorCode;
-import org.example.mycrud.Repository.ForgotPasswordRepository;
-import org.example.mycrud.Repository.UserRepository;
 import org.example.mycrud.Security.UserDetailsImpl;
 import org.example.mycrud.Service.JwtService;
 import org.example.mycrud.Service.MailService;
+import org.example.mycrud.Service.PasswordResetTokenService;
 import org.example.mycrud.Service.UserService;
 import org.example.mycrud.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,10 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -51,10 +48,13 @@ public class AuthController {
     private MailService mailService;
 
     @Autowired
-    private ForgotPasswordRepository forgotPasswordRepository;
+    private PasswordResetTokenService passwordResetTokenService;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Value("${forgetpassword.token.urlVerifyToken}")
+    String verifyToken;
+
+    @Value("${forgetpassword.token.expired}")
+    private long EXPIRE_MINUTES;
 
 
     @PostMapping("/signin")
@@ -83,7 +83,7 @@ public class AuthController {
 
     @PostMapping(value = "/signup")
     public ResponseEntity<?> signUser(@RequestBody SignupRequest signupRequest) {
-        if (!userService.checkUserName(signupRequest.getUsername())) {
+        if (userService.checkUserName(signupRequest.getUsername())) {
             return ResponseEntity.badRequest().body(BaseResponse.builder().code(1).message("Error: Username already exists").build());
         }
 
@@ -158,77 +158,58 @@ public class AuthController {
         return ResponseEntity.ok().body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message(ErrorCode.SUCCESS.getMessage()).build());
     }
 
-    @PostMapping("/verify/{email}")
-    public ResponseEntity<?> verifyEmail(@PathVariable String email) {
-        User userEmail = userService.getByEmail(email);
-
-        MailBody mailBody = MailBody.builder()
-                .to(email)
-                .text("This is the OTP for your Forgot Password request :" + otpGenerate())
-                .subject("OTP for  Forgot Password request")
-                .build();
-
-        ForgotPassword fp = ForgotPassword.builder()
-                .otp(otpGenerate())
-                .expratetime(Date.from(Instant.now().plusMillis(TimeUnit.MINUTES.toMillis(5))))
-                .user(userEmail)
-                .build();
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO, HttpServletRequest request) {
+        User userEmail = userService.getByEmail(forgotPasswordDTO.getEmail());
 
         if (userEmail == null) {
             return ResponseEntity.badRequest()
-                    .body(BaseResponse.builder().code(ErrorCode.NOT_FOUND.getCode()).message(ErrorCode.NOT_FOUND.getMessage()));
+                    .body(BaseResponse.builder().code(ErrorCode.NOT_FOUND.getCode()).message(ErrorCode.NOT_FOUND.getMessage()).build());
         }
-        mailService.sendEmail(mailBody);
-        forgotPasswordRepository.save(fp);
 
+        PasswordResetToken token = new PasswordResetToken();
+        token.setUser(userEmail);
+        token.setToken(UUID.randomUUID().toString());
+        token.setExprationtime(Date.from(Instant.now().plusMillis(TimeUnit.MINUTES.toMillis(EXPIRE_MINUTES))));
+        token = passwordResetTokenService.save(token);
+
+        Map<String, Object> mailModel = new HashMap<>();
+        mailModel.put("token", token);
+        mailModel.put("user", userEmail);
+        mailModel.put("signature", verifyToken);
+        mailModel.put("reset URL", this.verifyToken + "/reset-Password?token=" + token.getToken());
+
+        MailBody mailBody = MailBody.builder()
+                .to(forgotPasswordDTO.getEmail())
+                .subject("Password reset request")
+                .text(mailModel)
+                .build();
+
+        mailService.sendEmail(mailBody);
         return ResponseEntity.ok()
-                .body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message("Email sent for verification!").build());
+                .body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message(ErrorCode.SUCCESS.getMessage()).build());
     }
 
-    @PostMapping("/verify/{email}/{otp}")
-    public ResponseEntity<?> verifyOTP(@PathVariable String email, @PathVariable Integer otp) {
-        User userEmail = userService.getByEmail(email);
-
-        ForgotPassword fp = forgotPasswordRepository.findByOtpAndUser(otp, userEmail)
-                .orElseThrow(() -> new RuntimeException("Invalid OTP for email" + email));
-
-        if (fp.getExpratetime().before(Date.from(Instant.now()))) {
-            forgotPasswordRepository.deleteById(fp.getFpid());
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordReset passwordReset, @RequestParam(name = "token") String theToken) {
+        PasswordResetToken token = passwordResetTokenService.getByToken(theToken);
+        User user = token.getUser();
+        if (token.getExprationtime().before(Date.from(Instant.now()))) {
+            passwordResetTokenService.deleteTokenById(token.getToken_id());
             return ResponseEntity.badRequest()
                     .body(BaseResponse.builder().code(ErrorCode.UNAUTHORIZED.getCode()).message("OTP has Expired").build());
         }
 
-        return ResponseEntity.ok()
-                .body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message(ErrorCode.SUCCESS.getMessage()).content("OTP verify").build());
-    }
-
-    @PostMapping("/reset-Password")
-    public ResponseEntity<?> resetPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
-
-        User user = userService.getByEmail(forgotPasswordDTO.getEmail());
-
-        if (isValidPassword(forgotPasswordDTO.getNewPassword())) {
+        if (userService.newPasswordValidity(passwordReset.getNewPassword(), passwordReset.getConfirmPassword())) {
             return ResponseEntity.badRequest()
-                    .body(BaseResponse.builder().code(1).message("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter").build());
+                    .body(BaseResponse.builder().code(ErrorCode.INVALID_CREDENTIALS.getCode()).message("Please enter again your password!").build());
         }
-
-        if (userService.newPasswordValidity(forgotPasswordDTO.getNewPassword(), forgotPasswordDTO.getConfirmPassword())) {
-            return ResponseEntity.badRequest()
-                    .body(BaseResponse.builder().code(ErrorCode.INVALID_CREDENTIALS.getCode()).message("Please enter the password again!").build());
-        }
-
-        userService.changePassword(user, forgotPasswordDTO.getNewPassword());
-        //userRepository.updatePassword(email, passwordEncoder.encode(forgotPasswordDTO.getNewPassword()));
-
+        user.setPassword(passwordEncoder.encode(passwordReset.getNewPassword()));
+        userService.saveUser(user);
         return ResponseEntity.ok()
-                .body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message("Password has been changed!").build());
+                .body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message(ErrorCode.SUCCESS.getMessage()).build());
     }
 
-
-    private Integer otpGenerate() {
-        Random random = new Random();
-        return random.nextInt(100_000, 999_999);
-    }
 
     private boolean isValidPassword(String password) {
         // Check character length

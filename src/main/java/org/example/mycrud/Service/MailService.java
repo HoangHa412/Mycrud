@@ -17,13 +17,12 @@ public class MailService {
     private JavaMailSender javaMailSender;
 
 
-//
-
     public void sendEmail(MailBody mailBody) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(mailBody.to());
-        message.setSubject(mailBody.subject());
-        message.setText(mailBody.text());
+        message.setTo(mailBody.getTo());
+        message.setSubject(mailBody.getSubject());
+        message.setText(mailBody.getText().toString());
+
         javaMailSender.send(message);
     }
 }

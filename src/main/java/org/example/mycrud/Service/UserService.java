@@ -15,10 +15,7 @@ public interface UserService {
 
     List<User> search(String keyword);
 
-    void forgetPassword(String email, String password);
-
     User getByEmail(String email);
-
 
     User getByUsername(String username);
 

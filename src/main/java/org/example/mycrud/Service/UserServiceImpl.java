@@ -1,8 +1,7 @@
-package org.example.mycrud.Service.Impl;
+package org.example.mycrud.Service;
 
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Repository.UserRepository;
-import org.example.mycrud.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PasswordResetTokenService passwordResetTokenService;
 
 
     @Override
@@ -78,21 +80,5 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @Override
-    public void forgetPassword(String email, String password) {
-        //find email
-        User oCurrentMail = userRepository.findUsersByEmail(email.trim());
-
-        if (oCurrentMail != null) {
-            //set new password
-            oCurrentMail.setPassword(passwordEncoder.encode(password));
-
-            //save new password
-            userRepository.save(oCurrentMail);
-        } else {
-            throw new RuntimeException("User not found");
-        }
-
-    }
 
 }

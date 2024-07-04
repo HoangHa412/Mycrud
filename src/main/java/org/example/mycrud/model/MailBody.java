@@ -1,7 +1,19 @@
 package org.example.mycrud.model;
 
-import lombok.Builder;
+import lombok.*;
+
+import java.util.Map;
+import java.util.Objects;
 
 @Builder
-public record MailBody(String to, String subject, String text) {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public final class MailBody {
+    private String to;
+    private String subject;
+    private Map<String, Object> text;
+
+
 }
