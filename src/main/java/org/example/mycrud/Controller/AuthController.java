@@ -107,7 +107,7 @@ public class AuthController {
 
     @PostMapping("/refreshToken")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO) {
-        Long userIdFromRefreshToken = jwtService.getIdFromJwtToken(refreshTokenDTO.getRefreshToken());
+        Integer userIdFromRefreshToken = jwtService.getIdFromJwtToken(refreshTokenDTO.getRefreshToken());
         if (userIdFromRefreshToken == null) {
             return ResponseEntity.badRequest()
                     .body(BaseResponse.builder().code(ErrorCode.UNAUTHORIZED.getCode()).message(ErrorCode.UNAUTHORIZED.getMessage()).build());

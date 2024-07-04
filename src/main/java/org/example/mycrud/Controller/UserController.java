@@ -46,7 +46,7 @@ public class UserController {
 
     @GetMapping("{id}")
     @ResponseBody
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         User user = userService.getByID(id);
         BaseResponse<UserDto> response = new BaseResponse<>();
         if (user != null) {
@@ -70,7 +70,7 @@ public class UserController {
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
         if (userService.getByID(id) != null) {
             userService.deleteById(id);
             return ResponseEntity.ok(new BaseResponse<>(ErrorCode.SUCCESS.getCode(), ErrorCode.SUCCESS.getMessage(), null));
@@ -81,7 +81,7 @@ public class UserController {
 
     @PutMapping(value = "/edit/{id}")
     @ResponseBody
-    public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody UserDto userdto) {
+    public ResponseEntity<?> editUser(@PathVariable Integer id, @RequestBody UserDto userdto) {
         BaseResponse response = new BaseResponse();
         User existingUser = userService.getByID(id);
         if (existingUser != null) {

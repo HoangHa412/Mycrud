@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select u from User u where u.username like %?1%")
     List<User> search(String keyword);
 

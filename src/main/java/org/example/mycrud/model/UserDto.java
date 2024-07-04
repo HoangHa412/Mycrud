@@ -15,7 +15,7 @@ import org.example.mycrud.Entity.Role;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-    private Long id;
+    private Integer id;
     @NotBlank(message = "Name is mandatory")
     private String username;
 

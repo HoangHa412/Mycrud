@@ -14,13 +14,13 @@ import java.util.Set;
 @Data
 public class UserDetailsImpl implements UserDetails {
 
-    private Long id;
+    private Integer id;
     private String username;
     private String passwword;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String passwword, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(Integer id, String username, String passwword, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.passwword = passwword;

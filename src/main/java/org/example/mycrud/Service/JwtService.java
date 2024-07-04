@@ -59,13 +59,13 @@ public class JwtService {
                 .getSubject();
     }
 
-    public Long getIdFromJwtToken(String token) {
+    public Integer getIdFromJwtToken(String token) {
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(generateKey()).build()
                     .parseClaimsJws(token)
                     .getBody();
-            return (Long) claims.get("userId");
+            return (Integer) claims.get("userId");
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
