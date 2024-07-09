@@ -22,11 +22,11 @@ public class UserRole {
     @Column(name = "role_id")
     private Integer roleId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
-    private Role role;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+//    private User user;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "role_id", referencedColumnName = "id", insertable = false, updatable = false)
+//    private Role role;
 }

@@ -31,14 +31,14 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<UserRole> userRoles;
+//    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+//    private Set<UserRole> userRoles;
 
     @OneToOne(mappedBy = "user")
     private PasswordResetToken passwordResetToken;
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(name = "user_role",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "role_id"))
-//    private Set<Role> roles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 }

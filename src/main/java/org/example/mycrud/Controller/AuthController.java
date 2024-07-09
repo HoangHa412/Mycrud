@@ -98,7 +98,6 @@ public class AuthController {
         User user = new User();
         user.setUsername(signupRequest.getUsername());
         user.setPassword(signupRequest.getPassword());
-        user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
 
         userService.saveUser(user);
         return ResponseEntity.ok()

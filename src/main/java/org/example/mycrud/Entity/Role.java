@@ -22,8 +22,8 @@ public class Role {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "role")
-    public Set<UserRole> userRole;
+//    @OneToMany(mappedBy = "role")
+//    public Set<UserRole> userRole;
 
 
 }
