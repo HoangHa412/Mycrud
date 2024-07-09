@@ -1,6 +1,7 @@
 package org.example.mycrud.Security;
 
 import lombok.Data;
+import org.example.mycrud.Entity.Role;
 import org.example.mycrud.Entity.User;
 import org.example.mycrud.Entity.UserRole;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 public class UserDetailsImpl implements UserDetails {
@@ -28,12 +31,10 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
-        Collection<GrantedAuthority> grantedAuthorities = new HashSet<>();
-
-        Set<UserRole> userRoles = user.getUserRoles();
-        for (UserRole userRole : userRoles) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(userRole.getRole().getName()));
-        }
+        Set<Role> roles = user.getRoles();
+        List<GrantedAuthority> grantedAuthorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
 
         return new UserDetailsImpl(
                 user.getId(),
