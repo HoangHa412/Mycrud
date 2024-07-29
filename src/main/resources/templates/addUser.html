@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Add User</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src ="/static/js/authtoken.js"></script>
 </head>
 <body>
 <div class="container">
@@ -12,15 +13,13 @@
         <h2 class="mt-5">Thêm danh sách</h2>
         <form id="insert_data">
             <label>Name</label>
-            <input type="text" class="form-control" id="name" placeholder="Nhập họ và tên">
+            <input type="text" class="form-control" id="username" placeholder="Nhập họ và tên">
             <label>Email</label>
             <input type="text" class="form-control" id="email" placeholder="Nhập Email">
             <label>Phone</label>
             <input type="text" class="form-control" id="phone" placeholder="Nhập số điện thoại">
             <label>Password</label>
             <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu">
-            <label>Role</label>
-            <input type="text" class="form-control" id="role">
             <br>
             <button class="btn btn-success" type="submit">Thêm</button>
         </form>
@@ -30,23 +29,19 @@
     $(document).ready(function () {
         $('#insert_data').submit(function (event) {
             event.preventDefault();
-            const name = $('#name').val();
+            const username = $('#username').val();
             const email = $('#email').val();
             const phone = $('#phone').val();
             const password = $('#password').val();
-            const role = $('#role').val();
 
-            $.ajax({
+            $.authenticatedAjax({
                 url: 'http://localhost:8081/users/save',
                 method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem("token")
-                },
                 contentType: 'application/json',
-                data: JSON.stringify({name, email, phone, password, role}),
+                data: JSON.stringify({username, email, phone, password}),
                 success: function () {
                     alert('User added successfully');
-                    $('#name').val('');
+                    $('#username').val('');
                     $('#email').val('');
                     $('#phone').val('');
                     $('#password').val('');

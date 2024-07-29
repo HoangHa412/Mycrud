@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="/static/favicon.ico">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/static/js/authtoken.js"></script>
 </head>
 <body>
 <div class="container">
@@ -22,29 +24,32 @@
         </div>
         <button type="submit" class="btn btn-primary">Login</button>
     </form>
+    <h2>Or login with</h2>
+    <a href="/oauth2/authorization/google">Google</a>
 </div>
+<p id="error" style="color:red;"></p>
 <script>
     $(document).ready(function () {
-        function login() {
-            $('#loginForm').submit(function (event) {
-                event.preventDefault();
-                const username = $('#name').val();
-                const password = $('#password').val();
-                $.ajax({
-                    url: 'http://localhost:8081/authenticate',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({username, password}),
-                    success: function (response) {
-                        console.log("JWT Token: ", response);
-                        localStorage.setItem("token", response);
-                        //window.location.href = "/index";
+        $('#loginForm').submit(function (event) {
+            event.preventDefault();
+            const username = $('#name').val();
+            const password = $('#password').val();
+            $.ajax({
+                url: 'http://localhost:8081/signin',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({username, password}),
+                success: function (response) {
+                    console.log("JWT Token: ", response);
+                    localStorage.setItem('access_token', response['accessToken']);
+                    if (response !== null){
+                     window.location.href = "/index";
+                    } else {
+                        document.getElementById('error').textContent = 'Invalid username or password';
                     }
-                })
-            });
-        }
-
-        login();
+                }
+            })
+        });
     });
 </script>
 </body>

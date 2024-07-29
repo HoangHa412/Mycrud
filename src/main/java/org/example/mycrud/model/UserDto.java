@@ -1,14 +1,10 @@
 package org.example.mycrud.model;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.mycrud.Entity.Role;
 
 @Getter
 @Setter
@@ -16,6 +12,7 @@ import org.example.mycrud.Entity.Role;
 @NoArgsConstructor
 public class UserDto {
     private Integer id;
+
     @NotBlank(message = "Name is mandatory")
     private String username;
 

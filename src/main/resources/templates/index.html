@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>Index</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/static/js/authtoken.js"></script>
 </head>
 <body>
 
@@ -19,6 +21,7 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Phone</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -27,45 +30,41 @@
             </tbody>
         </table>
     </div>
+    <div>
+        <a href="/index/chat" class="btn btn-primary mb-3">Chat</a>
+    </div>
 </div>
 <script>
     $(document).ready(function () {
-        function getUsers() {
-            $.ajax({
-                url: 'http://localhost:8081/users',
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem("token")
-                },
-                success: function (users) {
-                    $('#usersTable').empty();
-                    $.each(users, function (index, user) {
-                        //console.log(users);
-                        $('#usersTable').append(`
-                            <tr>
-                                 <td>${user.id}</td>
-                                 <td>${user.name}</td>
-                                 <td>${user.email}</td>
-                                 <td>${user.phone}</td>
-                                 <td>
-                                    <a href="/index/edit?id=${user.id}" class="btn btn-info btn-sm">Edit</a>
-                                    <button class="btn btn-danger btn-sm deleteUser" data-id="${user.id}" =>Delete</button>
-                                 </td>
-                             </tr>
-                       `);
-                    });
-                    event();
-                }
-            });
-        }
-
-        getUsers();
+        $.authenticatedAjax({
+            url: 'http://localhost:8081/users',
+            method: 'GET',
+            contentType: 'application/json',
+            success: function (users) {
+                $('#usersTable').empty();
+                $.each(users['content'], function (index, user) {
+                    $('#usersTable').append(`
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone}</td>
+                            <td>
+                                <a href="/index/edit?id=${user.id}" class="btn btn-info btn-sm">Edit</a>
+                                <button class="btn btn-danger btn-sm deleteUser" data-id="${user.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+                bindDeleteEvents();
+            }
+        });
     });
 
-    function event() {
+    function bindDeleteEvents() {
         $(document).on('click', '.deleteUser', function () {
             const id = $(this).data('id');
-            $.ajax({
+            $.authenticatedAjax({
                 url: `http://localhost:8081/users/delete/${id}`,
                 method: 'DELETE',
                 success: function () {
