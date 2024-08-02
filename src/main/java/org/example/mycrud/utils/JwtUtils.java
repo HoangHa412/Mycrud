@@ -5,6 +5,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.example.mycrud.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -28,7 +30,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .subject(userDetailsImpl.getUsername())
                 .claim("userID", userDetailsImpl.getId())
-                .claim("authorities", authorities)
+                .claim("Role", authorities)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plusSeconds(jwtExprition)))
                 .signWith(generateKey(), SignatureAlgorithm.HS256)

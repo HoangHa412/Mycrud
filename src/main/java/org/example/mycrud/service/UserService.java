@@ -1,8 +1,10 @@
 package org.example.mycrud.service;
 
 import org.example.mycrud.entity.User;
+import org.example.mycrud.model.request.SignupRequest;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
     List<User> getListUser();

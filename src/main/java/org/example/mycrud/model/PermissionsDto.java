@@ -9,9 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatNotification {
+public class PermissionsDto {
     private Integer id;
-    private String senderId;
-    private String recipientId;
-    private String content;
+    private String name;
+    private String description;
 }

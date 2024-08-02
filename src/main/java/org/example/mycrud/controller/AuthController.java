@@ -3,14 +3,16 @@ package org.example.mycrud.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.mycrud.entity.PasswordResetToken;
+import org.example.mycrud.entity.Role;
 import org.example.mycrud.entity.User;
 import org.example.mycrud.exception.ErrorCode;
 import org.example.mycrud.model.request.*;
 import org.example.mycrud.model.response.BaseResponse;
 import org.example.mycrud.model.response.LoginResponse;
 import org.example.mycrud.security.UserDetailsImpl;
+import org.example.mycrud.service.RoleService;
 import org.example.mycrud.utils.JwtUtils;
-import org.example.mycrud.service.MailService;
+import org.example.mycrud.service.Impl.MailService;
 import org.example.mycrud.service.PasswordResetTokenService;
 import org.example.mycrud.service.UserService;
 import org.example.mycrud.model.*;
@@ -32,7 +34,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@RestController()
+@RestController
+@RequestMapping("/auth")
 public class AuthController {
 
 
@@ -59,6 +62,8 @@ public class AuthController {
 
     @Value("${forgetpassword.token.expired}")
     private long EXPIRE_MINUTES;
+    @Autowired
+    private RoleService roleService;
 
 
     @PostMapping("/signin")
@@ -98,7 +103,7 @@ public class AuthController {
                     .body(BaseResponse.builder().code(1).message("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter").build());
         }
 
-        if(userService.newPasswordValidity(signupRequest.getPassword(), signupRequest.getCfPassword())){
+        if(!userService.newPasswordValidity(signupRequest.getPassword(), signupRequest.getCfPassword())){
             return ResponseEntity.badRequest()
                     .body(BaseResponse.builder().code(ErrorCode.INVALID_CREDENTIALS.getCode()).message("Please enter again your password!").build());
         }
@@ -107,7 +112,12 @@ public class AuthController {
         User user = new User();
         user.setUserName(signupRequest.getUsername());
         user.setPassword(signupRequest.getPassword());
-
+        Set<Role> roles = new HashSet<>();
+        if(signupRequest.getRoles() == null || signupRequest.getRoles().isEmpty()){
+            Optional<Role> defaultRole = roleService.getRoleByName("USER");
+            defaultRole.ifPresent(roles::add);
+        }
+        user.setRoles(roles);
         userService.saveUser(user);
         return ResponseEntity.ok()
                 .body(BaseResponse.builder().code(ErrorCode.SUCCESS.getCode()).message("User successfully register").content(user).build());
@@ -199,7 +209,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody PasswordReset passwordReset, @RequestParam(name = "token") String theToken) {
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest passwordReset, @RequestParam(name = "token") String theToken) {
         PasswordResetToken token = passwordResetTokenService.getByToken(theToken);
         User user = token.getUser();
         if (token.getExprationtime().before(Date.from(Instant.now()))) {

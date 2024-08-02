@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
+
 @ControllerAdvice
 public class GobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
@@ -45,15 +47,15 @@ public class GobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    @ExceptionHandler(value = JwtException.class)
+    @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<BaseResponse<String>> handlingJwtException(JwtException exception) {
         BaseResponse<String> response = new BaseResponse<>();
 
-        response.setCode(ErrorCode.INVALID_CREDENTIALS.getCode());
-        response.setMessage(ErrorCode.INVALID_CREDENTIALS.getMessage());
+        response.setCode(ErrorCode.FORBIDDEN.getCode());
+        response.setMessage(ErrorCode.FORBIDDEN.getMessage());
         response.setContent(exception.getMessage());
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 
     }
 

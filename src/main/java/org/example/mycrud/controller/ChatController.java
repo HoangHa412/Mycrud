@@ -1,9 +1,9 @@
 package org.example.mycrud.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.mycrud.model.ChatNotification;
+import org.example.mycrud.model.response.ChatNotification;
 import org.example.mycrud.entity.ChatMessage;
-import org.example.mycrud.service.ChatMessageService;
+import org.example.mycrud.service.Impl.ChatMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;

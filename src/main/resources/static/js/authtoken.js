@@ -1,5 +1,5 @@
-$(document).ready(function() {
-    $.authenticatedAjax = function(options) {
+$(document).ready(function () {
+    $.authenticatedAjax = function (options) {
         const token = localStorage.getItem('access_token');
         if (!token) {
             window.location.href = '/login';
@@ -10,11 +10,11 @@ $(document).ready(function() {
         options.headers = options.headers || {};
         options.headers['Authorization'] = 'Bearer ' + token;
 
-        return $.ajax(options).fail(function(xhr) {
+        return $.ajax(options).fail(function (xhr) {
             if (xhr.status === 401) {
                 alert('Session expired or unauthorized. Please log in again.');
                 localStorage.removeItem('access_token');
-                window.location.href = '/login';
+                window.location.href = '/';
             }
         });
     };

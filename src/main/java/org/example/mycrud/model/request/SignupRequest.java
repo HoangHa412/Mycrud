@@ -1,9 +1,9 @@
 package org.example.mycrud.model.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -11,6 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SignupRequest {
     private String username;
+    @NotNull
     private String password;
+    @NonNull
     private String cfPassword;
+    private Set<String> roles;
 }

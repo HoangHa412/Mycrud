@@ -6,28 +6,27 @@
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/css/login.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/static/js/authtoken.js"></script>
 </head>
 <body>
-<div class="container">
-    <h1 class="mt-5">Login</h1>
-
-    <form id="loginForm" class="mt-4">
-        <div class="form-group">
-            <label for="name">Username</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter username">
-        </div>
-        <div class="form-group">
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="error-message" id="errorMessage"></div>
+            <label for="name">UserName</label>
+            <input type="text" id="name" name="name" required>
             <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p style="text-align: center">Continue with </p>
+        <div class="google-btn">
+            <a href="/oauth2/authorization/google"><img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" width="20"></a>
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
-    <h2>Or login with</h2>
-    <a href="/oauth2/authorization/google">Google</a>
-</div>
-<p id="error" style="color:red;"></p>
+    </div>
+
 <script>
     $(document).ready(function () {
         $('#loginForm').submit(function (event) {
@@ -35,18 +34,21 @@
             const username = $('#name').val();
             const password = $('#password').val();
             $.ajax({
-                url: 'http://localhost:8081/signin',
+                url: 'http://localhost:8081/auth/signin',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({username, password}),
                 success: function (response) {
-                    console.log("JWT Token: ", response);
+                    //console.log("JWT Token: ", response);
                     localStorage.setItem('access_token', response['accessToken']);
                     if (response !== null){
                      window.location.href = "/index";
                     } else {
-                        document.getElementById('error').textContent = 'Invalid username or password';
+                        throw new Error("Invalid Credentials")
                     }
+                },
+                error: function (error) {
+                    $('#errorMessage').text("Invalid Credentials");
                 }
             })
         });

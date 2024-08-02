@@ -17,21 +17,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
-public class UserDetailsImpl implements UserDetails, OAuth2User {
+public class UserDetailsImpl implements UserDetails {
 
     private Integer id;
     private String username;
-    private String passwword;
+    private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    @Setter
-    private Map<String, Object> attributes;
 
-    public UserDetailsImpl(Integer id, String username, String passwword, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(Integer id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
-        this.passwword = passwword;
+        this.password = password;
         this.authorities = authorities;
     }
 
@@ -49,14 +47,6 @@ public class UserDetailsImpl implements UserDetails, OAuth2User {
         );
     }
 
-    public static UserDetailsImpl build(User user, Map<String, Object> attributes){
-        UserDetailsImpl userDetails = UserDetailsImpl.build(user);
-        userDetails.setAttributes(attributes);
-        return userDetails;
-    }
-
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
@@ -64,7 +54,7 @@ public class UserDetailsImpl implements UserDetails, OAuth2User {
 
     @Override
     public String getPassword() {
-        return passwword;
+        return password;
     }
 
     @Override
@@ -90,15 +80,5 @@ public class UserDetailsImpl implements UserDetails, OAuth2User {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
-
-    @Override
-    public String getName() {
-        return String.valueOf(id);
     }
 }

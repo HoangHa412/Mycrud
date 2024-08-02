@@ -1,20 +1,21 @@
 package org.example.mycrud.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.example.mycrud.entity.Role;
 import org.example.mycrud.entity.User;
 import org.example.mycrud.exception.ErrorCode;
 import org.example.mycrud.mapper.UserMapper;
 import org.example.mycrud.model.UserDto;
+import org.example.mycrud.service.RoleService;
 import org.example.mycrud.service.UserService;
 import org.example.mycrud.model.response.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -29,7 +30,11 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
-    @GetMapping(value = "")
+    @Autowired
+    private RoleService roleService;
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> index(@Param("name") String name) {
         List<User> users = userService.getListUser();
 //        if (name != null) {
@@ -84,7 +89,14 @@ public class UserController {
             existingUser.setUserName(userdto.getUsername());
             existingUser.setEmail(userdto.getEmail());
             existingUser.setPhone(userdto.getPhone());
+            Set<Role> roles = new HashSet<>();
+            userdto.getRoles().forEach(roleName ->{
+                Optional<Role> role = roleService.getRoleByName(roleName);
+                role.ifPresent(roles::add);
+            });
+            existingUser.setRoles(roles);
             userService.saveUser(existingUser);
+
             response.setCode(ErrorCode.SUCCESS.getCode());
             response.setMessage(ErrorCode.SUCCESS.getMessage());
             response.setContent(userMapper.convertToUserDto(existingUser));

@@ -45,6 +45,11 @@ public class DisplayController {
         return "ChatIndex";
     }
 
+    @GetMapping("/loading")
+    public String handleLoading() {
+        return "loading";
+    }
+
     @MessageMapping("/user.addUser")
     @SendTo("/user/public")
     public User addUser(@Payload User user) {

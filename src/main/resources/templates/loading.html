@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đang Tải...</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        .loading-container {
+            text-align: center;
+        }
+
+        .loading-container h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="loading-container">
+    <div class="loader"></div>
+    <h1>Đang tải, vui lòng chờ...</h1>
+</div>
+</body>
+<script>
+    $(document).ready(function () {
+        // Get the full URL of the current page
+        const currentUrl = window.location.href;
+
+        // Create a URL object from the current URL
+        const urlObj = new URL(currentUrl);
+
+        // Get the search parameters from the URL
+        const params = new URLSearchParams(urlObj.search);
+
+        // Access individual query parameters
+        const token = params.get('token'); // Get the value of the 'token' parameter
+
+        if (token == null) {
+            window.location.href = "/";
+        } else {
+            // Lưu token vào localStorage
+            localStorage.setItem('access_token', token);
+            console.log(token);
+            window.location.href = "/index"; // Redirect to the index page after login
+        }
+    });
+</script>
+</html>

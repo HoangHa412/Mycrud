@@ -1,0 +1,35 @@
+/**{*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*}*/
+.menu .list-tab{
+    margin-bottom: 20px;
+    text-align: center;
+}
+.menu .list-tab li{
+    list-style: none;
+    display: inline;
+    margin: 30px;
+}
+
+h1{
+    text-align: center;
+    margin-bottom: 30px;
+}
+.users-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+table {
+    border-collapse: collapse;
+    width: 10%; /* Đặt chiều rộng theo ý muốn */
+}
+table, th, td {
+    border: 1px solid black;
+}
+/*th, td {*/
+/*    padding: 10px;*/
+/*    text-align: left;*/
+/*}*/

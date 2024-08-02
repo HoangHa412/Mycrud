@@ -4,38 +4,40 @@ import org.example.mycrud.security.CustomSuccessHandler;
 import org.example.mycrud.security.JwtAuthenticationFilter;
 import org.example.mycrud.security.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
-import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
-import org.springframework.security.oauth2.core.endpoint.DefaultMapOAuth2AccessTokenResponseConverter;
-import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.web.client.RestTemplate;
 
-import java.beans.Customizer;
-import java.util.Arrays;
-import java.util.Objects;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.SecretKeySpec;
+
+import java.security.NoSuchAlgorithmException;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+@EnableMethodSecurity
+public class SecurityConfig{
 
     @Autowired
     private UserDetailServiceImpl userDetailServiceImpl;
@@ -48,6 +50,9 @@ public class SecurityConfig {
 
     @Autowired
     private RestAuthenticationEntryPoint entryPoint;
+
+    @Value("${mycrud.jwtSecret}")
+    private String jwtSecret;
 
     @Bean
     public JwtAuthenticationFilter authenticationFilter() {
@@ -66,9 +71,9 @@ public class SecurityConfig {
                 ))
                 .authorizeHttpRequests(registry -> {
                     registry
-                            .requestMatchers("/static/**").permitAll()
+                            .requestMatchers("/loading", "/login").permitAll()
                             .requestMatchers("/index/**", "ws/**").permitAll()
-                            .requestMatchers("/signin", "/signup", "/login").permitAll()
+                            .requestMatchers("/auth/**", "/static/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -76,6 +81,9 @@ public class SecurityConfig {
                 .oauth2Login(login -> login
                         .loginPage("/login")
                         .successHandler(successHandler))
+                .logout(logout -> logout
+                        .logoutUrl("/")
+                        .logoutSuccessUrl("/login"))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
@@ -99,13 +107,11 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-//    private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient() {
-//        OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter = new OAuth2AccessTokenResponseHttpMessageConverter();
-//        tokenResponseHttpMessageConverter.setAccessTokenResponseConverter(new OAuth2AccessTokenResponseConverterWithDefaults());
-//        RestTemplate restTemplate = new RestTemplate(Arrays.asList(new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
-//        restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
-//        DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
-//        tokenResponseClient.setRestOperations(restTemplate);
-//        return tokenResponseClient;
-//    }
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        byte[] secretBytes = jwtSecret.getBytes();
+        SecretKey key = new SecretKeySpec(secretBytes, "HS256");
+        return NimbusJwtDecoder.withSecretKey(key).build();
+    }
+
 }

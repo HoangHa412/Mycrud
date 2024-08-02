@@ -5,35 +5,39 @@
     <title>Index</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/index.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/static/js/authtoken.js"></script>
 </head>
 <body>
+    <section>
+        <h1 class="mt-5">User Management</h1>
+        <div class="menu">
+            <ul class="list-tab">
+                <li><a href="/index/add" class="btn btn-primary mb-3">Add User</a></li>
+                <li><a href="/index/chat" class="btn btn-primary mb-3">Chat</a></li>
+            </ul>
+        </div>
 
-<div class="container">
-    <h1 class="mt-5">User Management</h1>
-    <a href="/index/add" class="btn btn-primary mb-3">Add User</a>
-    <div id="userList">
-        <h2>User List</h2>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody id="usersTable">
+        <div id="userList">
+            <h2>User List</h2>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="tbl-body">
 
-            </tbody>
-        </table>
-    </div>
-    <div>
-        <a href="/index/chat" class="btn btn-primary mb-3">Chat</a>
-    </div>
-</div>
+                </tbody>
+            </table>
+        </div>
+</section>
 <script>
     $(document).ready(function () {
         $.authenticatedAjax({
@@ -41,14 +45,16 @@
             method: 'GET',
             contentType: 'application/json',
             success: function (users) {
-                $('#usersTable').empty();
+                $('#tbl-body').empty();
+                console.log(users['content'])
                 $.each(users['content'], function (index, user) {
-                    $('#usersTable').append(`
+                    $('#tbl-body').append(`
                         <tr>
                             <td>${user.id}</td>
                             <td>${user.username}</td>
                             <td>${user.email}</td>
                             <td>${user.phone}</td>
+                            <td>${user.roles}</td>
                             <td>
                                 <a href="/index/edit?id=${user.id}" class="btn btn-info btn-sm">Edit</a>
                                 <button class="btn btn-danger btn-sm deleteUser" data-id="${user.id}">Delete</button>

@@ -1,7 +1,8 @@
-package org.example.mycrud.service;
+package org.example.mycrud.service.Impl;
 
 import org.example.mycrud.entity.PasswordResetToken;
 import org.example.mycrud.repository.PasswordResetTokenRepository;
+import org.example.mycrud.service.PasswordResetTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

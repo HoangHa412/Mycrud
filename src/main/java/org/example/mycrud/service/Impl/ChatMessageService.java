@@ -1,4 +1,4 @@
-package org.example.mycrud.service;
+package org.example.mycrud.service.Impl;
 
 import org.example.mycrud.entity.ChatMessage;
 import org.example.mycrud.repository.ChatMessageRepository;
